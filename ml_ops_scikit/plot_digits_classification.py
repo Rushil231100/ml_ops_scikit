@@ -1,10 +1,12 @@
 """
 ================================
-Recognizing hand-written digits
+            QUIZ 1
 ================================
+--Rushil Sanghavi (B18CSE066)
 
 This example shows how scikit-learn can be used to recognize images of
-hand-written digits, from 0-9.
+hand-written digits, from 0-9. 
+It shows the variation of accuracy with respect to change in image size and train test ratio. 
 """
 
 print(__doc__)
@@ -14,11 +16,55 @@ print(__doc__)
 
 # Standard scientific Python imports
 import matplotlib.pyplot as plt
-
+from skimage.transform import resize
 # Import datasets, classifiers and performance metrics
 from sklearn import datasets, svm, metrics
 from sklearn.model_selection import train_test_split
+import numpy as np
+def get_accuracy(test_to_train_ratio,imgs):
+    data = imgs.reshape((n_samples, -1))
 
+    # Create a classifier: a support vector classifier
+    clf = svm.SVC(gamma=0.001)
+
+    # Split data into 50% train and 50% test subsets
+    X_train, X_test, y_train, y_test = train_test_split(
+        data, digits.target, test_size=test_to_train_ratio, shuffle=False)
+    # print(X_train.shape)
+    # Learn the digits on the train subset
+    clf.fit(X_train, y_train)
+
+    # Predict the value of the digit on the test subset
+    predicted = clf.predict(X_test)
+
+    ###############################################################################
+    # Below we visualize the first 4 test samples and show their predicted
+    # digit value in the title.
+
+    # _, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
+    # for ax, image, prediction in zip(axes, X_test, predicted):
+    #     ax.set_axis_off()
+    #     image = image.reshape(8, 8)
+    #     ax.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
+    #     ax.set_title(f'Prediction: {prediction}')
+
+    ###############################################################################
+    # :func:`~sklearn.metrics.classification_report` builds a text report showing
+    # the main classification metrics.
+
+    # print(f"Classification report for classifier {clf}:\n"
+    #       f"{metrics.classification_report(y_test, predicted)}\n")
+    # print(round(metrics.accuracy_score(y_test, predicted),4))
+    return round(100*metrics.accuracy_score(y_test, predicted),2) #, round(sklearn.metrics.f1_score(y_test, predicted, *, labels=None, pos_label=1, average='binary', sample_weight=None, zero_division='warn'),2)
+###############################################################################
+# We can also plot a :ref:`confusion matrix <confusion_matrix>` of the
+# true digit values and the predicted digit values.
+
+# disp = metrics.plot_confusion_matrix(clf, X_test, y_test)
+# disp.figure_.suptitle("Confusion Matrix")
+# print(f"Confusion matrix:\n{disp.confusion_matrix}")
+
+#plt.show()
 ###############################################################################
 # Digits dataset
 # --------------
@@ -35,11 +81,12 @@ from sklearn.model_selection import train_test_split
 
 digits = datasets.load_digits()
 
-_, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
-for ax, image, label in zip(axes, digits.images, digits.target):
-    ax.set_axis_off()
-    ax.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
-    ax.set_title('Training: %i' % label)
+# _, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
+# for ax, image, label in zip(axes, digits.images, digits.target):
+#     ax.set_axis_off()
+#     ax.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
+#     ax.set_title('Training: %i' % label)
+
 
 ###############################################################################
 # Classification
@@ -57,46 +104,26 @@ for ax, image, label in zip(axes, digits.images, digits.target):
 # in the test subset.
 
 # flatten the images
+test_to_train_ratio = [0.1,0.2,0.3]
+image_resolution = [64,32,8]
 n_samples = len(digits.images)
-data = digits.images.reshape((n_samples, -1))
 
-# Create a classifier: a support vector classifier
-clf = svm.SVC(gamma=0.001)
+# print(imgs.shape)
+# print(n_samples,digits.images.shape,get_accuracy(test_to_train_ratio,image_resolution))
 
-# Split data into 50% train and 50% test subsets
-X_train, X_test, y_train, y_test = train_test_split(
-    data, digits.target, test_size=0.5, shuffle=False)
-
-# Learn the digits on the train subset
-clf.fit(X_train, y_train)
-
-# Predict the value of the digit on the test subset
-predicted = clf.predict(X_test)
-
-###############################################################################
-# Below we visualize the first 4 test samples and show their predicted
-# digit value in the title.
-
-_, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
-for ax, image, prediction in zip(axes, X_test, predicted):
-    ax.set_axis_off()
-    image = image.reshape(8, 8)
-    ax.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
-    ax.set_title(f'Prediction: {prediction}')
-
-###############################################################################
-# :func:`~sklearn.metrics.classification_report` builds a text report showing
-# the main classification metrics.
-
-print(f"Classification report for classifier {clf}:\n"
-      f"{metrics.classification_report(y_test, predicted)}\n")
-
-###############################################################################
-# We can also plot a :ref:`confusion matrix <confusion_matrix>` of the
-# true digit values and the predicted digit values.
-
-disp = metrics.plot_confusion_matrix(clf, X_test, y_test)
-disp.figure_.suptitle("Confusion Matrix")
-print(f"Confusion matrix:\n{disp.confusion_matrix}")
-
-plt.show()
+# _, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
+# for ax, image, label in zip(axes,imgs, digits.target):
+#     ax.set_axis_off()
+#     ax.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
+#     ax.set_title('Training: %i' % label)
+# print(test_to_train_ratio,image_resolution,get_accuracy(test_to_train_ratio,imgs))
+print("Image.size -->\tTrain-Test -->\tAccuracy ")
+print("================================================")
+for i in image_resolution :
+    imgs = np.empty((n_samples,i,i))
+    for k in range(n_samples):
+        imgs[k] = resize(digits.images[k], (i,i),anti_aliasing=True)
+    for j in test_to_train_ratio:
+        print(str(i)+"x"+str(i)+"    -->\t",str(int(100-(100*j)))+":"+str(int(100*j))+"    -->\t",get_accuracy(j,imgs),"%",sep='')
+    print()
+# plt.show()
