@@ -33,8 +33,9 @@ Gamma_Value-->	Accuracy
 
 #OBSERVATIONS
 
-1. Initially gamma decreases till 0.01. and then increases.
+1. As gamma decreases, accuracy increses uptill gamma = 0.001, then accuracy slightly falls.
 2. Max value find at gamma = 0.001
+3. Step rate = 1/3
 
   
 
