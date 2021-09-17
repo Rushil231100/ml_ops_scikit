@@ -21,11 +21,14 @@ from skimage.transform import resize
 from sklearn import datasets, svm, metrics
 from sklearn.model_selection import train_test_split
 import numpy as np
-def get_accuracy(test_to_train_ratio,imgs):
+test_to_train_ratio = [0.2]
+image_resolution = [8]
+gamma_array = [1,0.3,0.1,0.03,0.01,0.003,0.001,0.0003,0.0001]
+def get_accuracy(test_to_train_ratio,imgs,gamma_val):
     data = imgs.reshape((n_samples, -1))
 
     # Create a classifier: a support vector classifier
-    clf = svm.SVC(gamma=0.001)
+    clf = svm.SVC(gamma=gamma_val)
 
     # Split data into 50% train and 50% test subsets
     X_train, X_test, y_train, y_test = train_test_split(
@@ -104,8 +107,9 @@ digits = datasets.load_digits()
 # in the test subset.
 
 # flatten the images
-test_to_train_ratio = [0.1,0.2,0.3]
-image_resolution = [64,32,8]
+#test_to_train_ratio = [0.1,0.2,0.3]
+#image_resolution = [64,32,8]
+
 n_samples = len(digits.images)
 
 # print(imgs.shape)
@@ -117,13 +121,15 @@ n_samples = len(digits.images)
 #     ax.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
 #     ax.set_title('Training: %i' % label)
 # print(test_to_train_ratio,image_resolution,get_accuracy(test_to_train_ratio,imgs))
-print("Image.size -->\tTrain-Test -->\tAccuracy ")
+print("Gamma_Value-->\tAccuracy ")
 print("================================================")
-for i in image_resolution :
-    imgs = np.empty((n_samples,i,i))
-    for k in range(n_samples):
-        imgs[k] = resize(digits.images[k], (i,i),anti_aliasing=True)
-    for j in test_to_train_ratio:
-        print(str(i)+"x"+str(i)+"    -->\t",str(int(100-(100*j)))+":"+str(int(100*j))+"    -->\t",get_accuracy(j,imgs),"%",sep='')
-    print()
+for index,gamma_val in enumerate(gamma_array):
+    for i in image_resolution :
+        imgs = np.empty((n_samples,i,i))
+        for k in range(n_samples):
+            imgs[k] = resize(digits.images[k], (i,i),anti_aliasing=True)
+        for j in test_to_train_ratio:
+        #print(str(i)+"x"+str(i)+"    -->\t",str(int(100-(100*j)))+":"+str(int(100*j))+"    -->\t",get_accuracy(j,imgs,gamma_val),"%",sep='')
+            print(gamma_val,"\t",get_accuracy(j,imgs,gamma_val))
+            print()
 # plt.show()
