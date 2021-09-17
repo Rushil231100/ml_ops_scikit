@@ -8,32 +8,33 @@ This is a readme file for feature/quiz breanch
 
 This example shows how scikit-learn can be used to recognize images of
 hand-written digits, from 0-9. 
-It shows the variation of accuracy with respect to change in image size and train test ratio. 
+It shows the variation of accuracy with respect to change in GAMMA
 
-Image.size -->	Train-Test -->	Accuracy 
+Gamma_Value-->	Accuracy 
+================================================
+1 	 	10.28
+	
+0.3 	 	10.28
 
-64x64    -->	90:10    -->	12.78% 
+0.1 	 	10.83
 
-64x64    -->	80:20    -->	13.89% 
+0.03 	 	15.83
 
-64x64    -->	70:30    -->	11.3%  
+0.01 	 	71.39
 
-32x32    -->	90:10    -->	78.33% 
+0.003 	 	94.44
 
-32x32    -->	80:20    -->	77.5%
+0.001 	 	95.83
 
-32x32    -->	70:30    -->	75.74%
+0.0003 	93.89
 
-8x8    -->		90:10    -->	96.11%
-
-8x8    -->		80:20    -->	95.83%
-
-8x8    -->		70:30    -->	97.04%s
+0.0001 	92.22
 
 
 #OBSERVATIONS
 
-1. Increasing the size of the image , decreases the accuracy drastically. As we see from 8x8 to 64x64 the accuracy is dropping upto ~80%
-2. For the dataset of same image resolutionn, if we change the train-test split ratio, accuracy does not depend on it. From the results above, there is no uniformity in selecting better train test ratio.
+1. Initially gamma decreases till 0.01. and then increases.
+2. Max value find at gamma = 0.001
+
   
 
