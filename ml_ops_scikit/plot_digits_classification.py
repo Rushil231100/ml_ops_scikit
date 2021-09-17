@@ -1,0 +1,135 @@
+"""
+================================
+            QUIZ 1
+================================
+--Rushil Sanghavi (B18CSE066)
+
+This example shows how scikit-learn can be used to recognize images of
+hand-written digits, from 0-9. 
+It shows the variation of accuracy with respect to change in image size and train test ratio. 
+"""
+
+print(__doc__)
+
+# Author: Gael Varoquaux <gael dot varoquaux at normalesup dot org>
+# License: BSD 3 clause
+
+# Standard scientific Python imports
+import matplotlib.pyplot as plt
+from skimage.transform import resize
+# Import datasets, classifiers and performance metrics
+from sklearn import datasets, svm, metrics
+from sklearn.model_selection import train_test_split
+import numpy as np
+test_to_train_ratio = [0.2]
+image_resolution = [8]
+gamma_array = [1,0.3,0.1,0.03,0.01,0.003,0.001,0.0003,0.0001]
+def get_accuracy(test_to_train_ratio,imgs,gamma_val):
+    data = imgs.reshape((n_samples, -1))
+
+    # Create a classifier: a support vector classifier
+    clf = svm.SVC(gamma=gamma_val)
+
+    # Split data into 50% train and 50% test subsets
+    X_train, X_test, y_train, y_test = train_test_split(
+        data, digits.target, test_size=test_to_train_ratio, shuffle=False)
+    # print(X_train.shape)
+    # Learn the digits on the train subset
+    clf.fit(X_train, y_train)
+
+    # Predict the value of the digit on the test subset
+    predicted = clf.predict(X_test)
+
+    ###############################################################################
+    # Below we visualize the first 4 test samples and show their predicted
+    # digit value in the title.
+
+    # _, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
+    # for ax, image, prediction in zip(axes, X_test, predicted):
+    #     ax.set_axis_off()
+    #     image = image.reshape(8, 8)
+    #     ax.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
+    #     ax.set_title(f'Prediction: {prediction}')
+
+    ###############################################################################
+    # :func:`~sklearn.metrics.classification_report` builds a text report showing
+    # the main classification metrics.
+
+    # print(f"Classification report for classifier {clf}:\n"
+    #       f"{metrics.classification_report(y_test, predicted)}\n")
+    # print(round(metrics.accuracy_score(y_test, predicted),4))
+    return round(100*metrics.accuracy_score(y_test, predicted),2) #, round(sklearn.metrics.f1_score(y_test, predicted, *, labels=None, pos_label=1, average='binary', sample_weight=None, zero_division='warn'),2)
+###############################################################################
+# We can also plot a :ref:`confusion matrix <confusion_matrix>` of the
+# true digit values and the predicted digit values.
+
+# disp = metrics.plot_confusion_matrix(clf, X_test, y_test)
+# disp.figure_.suptitle("Confusion Matrix")
+# print(f"Confusion matrix:\n{disp.confusion_matrix}")
+
+#plt.show()
+###############################################################################
+# Digits dataset
+# --------------
+#
+# The digits dataset consists of 8x8
+# pixel images of digits. The ``images`` attribute of the dataset stores
+# 8x8 arrays of grayscale values for each image. We will use these arrays to
+# visualize the first 4 images. The ``target`` attribute of the dataset stores
+# the digit each image represents and this is included in the title of the 4
+# plots below.
+#
+# Note: if we were working from image files (e.g., 'png' files), we would load
+# them using :func:`matplotlib.pyplot.imread`.
+
+digits = datasets.load_digits()
+
+# _, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
+# for ax, image, label in zip(axes, digits.images, digits.target):
+#     ax.set_axis_off()
+#     ax.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
+#     ax.set_title('Training: %i' % label)
+
+
+###############################################################################
+# Classification
+# --------------
+#
+# To apply a classifier on this data, we need to flatten the images, turning
+# each 2-D array of grayscale values from shape ``(8, 8)`` into shape
+# ``(64,)``. Subsequently, the entire dataset will be of shape
+# ``(n_samples, n_features)``, where ``n_samples`` is the number of images and
+# ``n_features`` is the total number of pixels in each image.
+#
+# We can then split the data into train and test subsets and fit a support
+# vector classifier on the train samples. The fitted classifier can
+# subsequently be used to predict the value of the digit for the samples
+# in the test subset.
+
+# flatten the images
+#test_to_train_ratio = [0.1,0.2,0.3]
+#image_resolution = [64,32,8]
+
+n_samples = len(digits.images)
+
+# print(imgs.shape)
+# print(n_samples,digits.images.shape,get_accuracy(test_to_train_ratio,image_resolution))
+
+# _, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
+# for ax, image, label in zip(axes,imgs, digits.target):
+#     ax.set_axis_off()
+#     ax.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
+#     ax.set_title('Training: %i' % label)
+# print(test_to_train_ratio,image_resolution,get_accuracy(test_to_train_ratio,imgs))
+print("Gamma_Value-->\tAccuracy ")
+print("================================================")
+for index,gamma_val in enumerate(gamma_array):
+    for i in image_resolution :
+        imgs = np.empty((n_samples,i,i))
+        for k in range(n_samples):
+            imgs[k] = resize(digits.images[k], (i,i),anti_aliasing=True)
+        for j in test_to_train_ratio:
+        #print(str(i)+"x"+str(i)+"    -->\t",str(int(100-(100*j)))+":"+str(int(100*j))+"    -->\t",get_accuracy(j,imgs,gamma_val),"%",sep='')
+            print(gamma_val,"\t",get_accuracy(j,imgs,gamma_val))
+            print()
+# plt.show()
