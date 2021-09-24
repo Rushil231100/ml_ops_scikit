@@ -8,7 +8,7 @@ This example shows how scikit-learn can be used to recognize images of
 hand-written digits, from 0-9. 
 It shows the variation of accuracy with respect to change in image size and train test ratio. 
 """
-
+#create a folder name models, add it to gitignore, save all models in it, load the best one olny, and refactor code with different functions
 print(__doc__)
 
 # Author: Gael Varoquaux <gael dot varoquaux at normalesup dot org>
@@ -21,23 +21,44 @@ from skimage.transform import resize
 from sklearn import datasets, svm, metrics
 from sklearn.model_selection import train_test_split
 import numpy as np
+from joblib import dump,load
+
 test_to_train_ratio = [0.2]
 image_resolution = [8]
 gamma_array = [1,0.3,0.1,0.03,0.01,0.003,0.001,0.0003,0.0001]
-def get_accuracy(test_to_train_ratio,imgs,gamma_val):
+argmax_gamma_model = {}
+def get_accuracy(test_to_train_ratio,val_to_test_ratio,imgs):
     data = imgs.reshape((n_samples, -1))
 
     # Create a classifier: a support vector classifier
-    clf = svm.SVC(gamma=gamma_val)
+    
 
     # Split data into 50% train and 50% test subsets
     X_train, X_test, y_train, y_test = train_test_split(
         data, digits.target, test_size=test_to_train_ratio, shuffle=False)
     # print(X_train.shape)
     # Learn the digits on the train subset
-    clf.fit(X_train, y_train)
-
+    X_test, X_val, y_test, y_val = train_test_split(X_test, y_test, test_size=val_to_test_ratio, shuffle=False)
+    
+    maxi=0
+    global argmax_gamma_model
+    for g in gamma_array:
+        clf = svm.SVC(gamma=g)
+        clf.fit(X_train, y_train)
+        predicted = clf.predict(X_val)
+        accuracy = metrics.accuracy_score(y_val, predicted)
+        if(maxi < accuracy):
+            maxi = accuracy
+            argmax_gamma_model["model_name"] = "best_accu_{}_gamme_{}_model.joblib".format(accuracy,g)
+            argmax_gamma_model["val_accu"] = accuracy
+            argmax_gamma_model["gamma"] = g
+            dump(clf,argmax_gamma_model["model_name"])
+            #print(argmax_gamma)
+    # print(argmax_gamma)
+    # clf = svm.SVC(gamma=argmax_gamma)
+    # clf.fit(X_train, y_train)
     # Predict the value of the digit on the test subset
+    clf = load(argmax_gamma_model["model_name"])
     predicted = clf.predict(X_test)
 
     ###############################################################################
@@ -123,13 +144,17 @@ n_samples = len(digits.images)
 # print(test_to_train_ratio,image_resolution,get_accuracy(test_to_train_ratio,imgs))
 print("Gamma_Value-->\tAccuracy ")
 print("================================================")
-for index,gamma_val in enumerate(gamma_array):
-    for i in image_resolution :
-        imgs = np.empty((n_samples,i,i))
-        for k in range(n_samples):
-            imgs[k] = resize(digits.images[k], (i,i),anti_aliasing=True)
-        for j in test_to_train_ratio:
-        #print(str(i)+"x"+str(i)+"    -->\t",str(int(100-(100*j)))+":"+str(int(100*j))+"    -->\t",get_accuracy(j,imgs,gamma_val),"%",sep='')
-            print(gamma_val,"\t",get_accuracy(j,imgs,gamma_val))
-            print()
+# print(argmax_gamma)
+best_accu = get_accuracy(0.2,0.5,digits.images)
+# print(argmax_gamma)
+print(argmax_gamma_model["gamma"] ,"   -->   ",best_accu)
+# for index,gamma_val in enumerate(gamma_array):
+#     for i in image_resolution :
+#         imgs = np.empty((n_samples,i,i))
+#         for k in range(n_samples):
+#             imgs[k] = resize(digits.images[k], (i,i),anti_aliasing=True)
+#         for j in test_to_train_ratio:
+#         #print(str(i)+"x"+str(i)+"    -->\t",str(int(100-(100*j)))+":"+str(int(100*j))+"    -->\t",get_accuracy(j,imgs,gamma_val),"%",sep='')
+#             print(gamma_val,"\t",get_accuracy(j,0.1,imgs))
+#             print()
 # plt.show()
