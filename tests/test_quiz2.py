@@ -16,7 +16,7 @@ def test_create_split_1():
     assert len(X_test) == 20
     assert len(X_val) == 10
     assert len(X_train) +len(X_test)+len(X_val)==100
-    print("All four parts, for n=100 , passed successfully!!")
+    print("\n\nAll four parts, for n=100 , passed successfully!!")
     
 def test_create_split_2():
     n=9
@@ -33,6 +33,23 @@ def test_create_split_2():
     assert len(X_val) == 1
     assert len(X_train) +len(X_test)+len(X_val)==9
     print("\nAll four parts, for n=9 , passed successfully!!")
+    
+def test_check_label_dimentionality():
+    n=100
+    train_part = 70
+    test_part = 20
+    val_part = 10
+    data_x = np.empty(n)
+    data_y = np.empty(n)
+    X_train, X_test,  X_val, y_train, y_test,y_val  = plot_digits_classification.create_split(data_x,data_y,train_part,test_part ,val_part)
+    
+    #print(len(X_train),len(X_test),len(X_val))
+    assert len(X_train) == len(y_train)
+    assert len(X_test) == len(y_test)
+    assert len(X_val) == len(y_val)
+    print("\nChecking for dimentionality of labels , passed successfully!!")
+    
+
     
 
     
