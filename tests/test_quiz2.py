@@ -16,6 +16,7 @@ def test_create_split_1():
     assert len(X_test) == 20
     assert len(X_val) == 10
     assert len(X_train) +len(X_test)+len(X_val)==100
+    print("All four parts, for n=100 , passed successfully!!")
     
 def test_create_split_2():
     n=9
@@ -31,6 +32,7 @@ def test_create_split_2():
     assert len(X_test) == 2
     assert len(X_val) == 1
     assert len(X_train) +len(X_test)+len(X_val)==9
+    print("\nAll four parts, for n=9 , passed successfully!!")
     
 
     
