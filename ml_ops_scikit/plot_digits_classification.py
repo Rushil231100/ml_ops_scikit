@@ -1,12 +1,11 @@
 """
 ================================
-            QUIZ 1
+            QUIZ 2
 ================================
 --Rushil Sanghavi (B18CSE066)
 
-This example shows how scikit-learn can be used to recognize images of
-hand-written digits, from 0-9. 
-It shows the variation of accuracy with respect to change in image size and train test ratio. 
+This example shows how testing of a targetted function works.
+
 """
 #create a folder name models, add it to gitignore, save all models in it, load the best one olny, and refactor code with different functions
 print(__doc__)
@@ -27,19 +26,27 @@ test_to_train_ratio = [0.2]
 image_resolution = [8]
 gamma_array = [1,0.3,0.1,0.03,0.01,0.003,0.001,0.0003,0.0001]
 argmax_gamma_model = {}
-def get_accuracy(test_to_train_ratio,val_to_test_ratio,imgs):
+
+def create_split(data_x,data_y, train_part=70,test_part = 20 ,val_part=10):
+    
+    X_train, X_test, y_train, y_test = train_test_split(data_x, data_y, test_size=((test_part+val_part)/ (train_part+test_part + val_part)), shuffle=False)
+    #print("before ",len(X_train),len(X_test))
+    X_test, X_val, y_test, y_val = train_test_split(X_test, y_test, test_size=((val_part)/(test_part+val_part)), shuffle=False)
+    
+    return X_train, X_test,  X_val, y_train, y_test,y_val 
+    
+def get_accuracy(imgs,train_part=70,test_part = 20 ,val_part=10):
     data = imgs.reshape((n_samples, -1))
 
     # Create a classifier: a support vector classifier
     
 
     # Split data into 50% train and 50% test subsets
-    X_train, X_test, y_train, y_test = train_test_split(
-        data, digits.target, test_size=test_to_train_ratio, shuffle=False)
+    #X_train, X_test, y_train, y_test = train_test_split(data, digits.target, test_size=test_to_train_ratio, shuffle=False)
     # print(X_train.shape)
     # Learn the digits on the train subset
-    X_test, X_val, y_test, y_val = train_test_split(X_test, y_test, test_size=val_to_test_ratio, shuffle=False)
-    
+    #X_test, X_val, y_test, y_val = train_test_split(X_test, y_test, test_size=val_to_test_ratio, shuffle=False)
+    X_train, X_test,  X_val, y_train, y_test,y_val  = create_split(data,digits.target,train_part,test_part ,val_part)
     maxi=0
     global argmax_gamma_model
     for g in gamma_array:
@@ -49,7 +56,7 @@ def get_accuracy(test_to_train_ratio,val_to_test_ratio,imgs):
         accuracy = metrics.accuracy_score(y_val, predicted)
         if(maxi < accuracy):
             maxi = accuracy
-            argmax_gamma_model["model_name"] = "best_accu_{}_gamme_{}_model.joblib".format(accuracy,g)
+            argmax_gamma_model["model_name"] = "models/best_accu_{}_gamma_{}_model.joblib".format(accuracy,g)
             argmax_gamma_model["val_accu"] = accuracy
             argmax_gamma_model["gamma"] = g
             dump(clf,argmax_gamma_model["model_name"])
@@ -142,12 +149,12 @@ n_samples = len(digits.images)
 #     ax.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
 #     ax.set_title('Training: %i' % label)
 # print(test_to_train_ratio,image_resolution,get_accuracy(test_to_train_ratio,imgs))
-print("Gamma_Value-->\tAccuracy ")
-print("================================================")
+#print("Gamma_Value-->\tAccuracy ")
+##print("================================================")
 # print(argmax_gamma)
-best_accu = get_accuracy(0.2,0.5,digits.images)
+#best_accu = get_accuracy(digits.images,70,20,10)
 # print(argmax_gamma)
-print(argmax_gamma_model["gamma"] ,"   -->   ",best_accu)
+#print(argmax_gamma_model["gamma"] ,"   -->   ",best_accu)
 # for index,gamma_val in enumerate(gamma_array):
 #     for i in image_resolution :
 #         imgs = np.empty((n_samples,i,i))
