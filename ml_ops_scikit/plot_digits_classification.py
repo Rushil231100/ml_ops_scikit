@@ -1,10 +1,10 @@
 """
 ================================
-            QUIZ 2
+       Assignment 6
 ================================
 --Rushil Sanghavi (B18CSE066)
 
-This example shows how testing of a targetted function works.
+This example shows how unit testing works.
 
 """
 #create a folder name models, add it to gitignore, save all models in it, load the best one olny, and refactor code with different functions
@@ -35,7 +35,7 @@ def create_split(data_x,data_y, train_part=70,test_part = 20 ,val_part=10):
     
     return X_train, X_test,  X_val, y_train, y_test,y_val 
     
-def get_accuracy(imgs,train_part=70,test_part = 20 ,val_part=10):
+def get_accuracy(imgs,expeted_model_file,train_part=70,test_part = 20 ,val_part=10):
     data = imgs.reshape((n_samples, -1))
 
     # Create a classifier: a support vector classifier
@@ -56,15 +56,16 @@ def get_accuracy(imgs,train_part=70,test_part = 20 ,val_part=10):
         accuracy = metrics.accuracy_score(y_val, predicted)
         if(maxi < accuracy):
             maxi = accuracy
-            argmax_gamma_model["model_name"] = "models/best_accu_{}_gamma_{}_model.joblib".format(accuracy,g)
+            argmax_gamma_model["model_name"] = expeted_model_file#"models/best_accu_{}_gamma_{}_model.joblib".format(accuracy,g)
             argmax_gamma_model["val_accu"] = accuracy
             argmax_gamma_model["gamma"] = g
-            dump(clf,argmax_gamma_model["model_name"])
+            
             #print(argmax_gamma)
     # print(argmax_gamma)
     # clf = svm.SVC(gamma=argmax_gamma)
     # clf.fit(X_train, y_train)
     # Predict the value of the digit on the test subset
+    dump(clf,argmax_gamma_model["model_name"])
     clf = load(argmax_gamma_model["model_name"])
     predicted = clf.predict(X_test)
 
@@ -86,7 +87,41 @@ def get_accuracy(imgs,train_part=70,test_part = 20 ,val_part=10):
     # print(f"Classification report for classifier {clf}:\n"
     #       f"{metrics.classification_report(y_test, predicted)}\n")
     # print(round(metrics.accuracy_score(y_test, predicted),4))
-    return round(100*metrics.accuracy_score(y_test, predicted),2) #, round(sklearn.metrics.f1_score(y_test, predicted, *, labels=None, pos_label=1, average='binary', sample_weight=None, zero_division='warn'),2)
+    train_metrics ={}
+    train_metrics['acc'] = round(100*metrics.accuracy_score(y_test, predicted),2)
+    train_metrics['f1'] = round(metrics.f1_score(y_test, predicted, average='macro'),2) 
+    
+    return train_metrics #, round(sklearn.metrics.f1_score(y_test, predicted, *, labels=None, pos_label=1, average='binary', sample_weight=None, zero_division='warn'),2)
+    
+    
+    
+def run_classification_experiment(train,val,expeted_model_file):
+    #X_train, X_test,  X_val, y_train, y_test,y_val  = create_split(data,digits.target,train_part,test_part ,val_part)
+    
+    X_train, X_test,  X_val, y_train, y_test,y_val = train.images,val.images,val.images,train.target,val.target,val.target
+    X_train = X_train.reshape((len(X_train), -1))
+    X_test = X_test.reshape((len(X_train), -1))
+    X_val = X_val.reshape((len(X_train), -1))
+    maxi=0
+    global argmax_gamma_model
+    for g in gamma_array:
+        clf = svm.SVC(gamma=g)
+        clf.fit(X_train, y_train)
+        predicted = clf.predict(X_val)
+        accuracy = metrics.accuracy_score(y_val, predicted)
+        if(maxi < accuracy):
+            maxi = accuracy
+            argmax_gamma_model["model_name"] = expeted_model_file#"models/best_accu_{}_gamma_{}_model.joblib".format(accuracy,g)
+            argmax_gamma_model["val_accu"] = accuracy
+            argmax_gamma_model["gamma"] = g
+    dump(clf,argmax_gamma_model["model_name"])
+    clf = load(argmax_gamma_model["model_name"])
+    predicted = clf.predict(X_test)
+    train_metrics ={}
+    train_metrics['acc'] = round(100*metrics.accuracy_score(y_test, predicted),2)
+    train_metrics['f1'] = round(metrics.f1_score(y_test, predicted, average='macro'),2) 
+    print(train_metrics)
+    return train_metrics
 ###############################################################################
 # We can also plot a :ref:`confusion matrix <confusion_matrix>` of the
 # true digit values and the predicted digit values.
