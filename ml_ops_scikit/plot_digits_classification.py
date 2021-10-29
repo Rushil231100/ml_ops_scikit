@@ -1,37 +1,24 @@
-"""
-================================
-       Assignment 6
-================================
---Rushil Sanghavi (B18CSE066)
 
-This example shows how unit testing works.
-
-"""
-#create a folder name models, add it to gitignore, save all models in it, load the best one olny, and refactor code with different functions
-print(__doc__)
-
-# Author: Gael Varoquaux <gael dot varoquaux at normalesup dot org>
-# License: BSD 3 clause
-
-# Standard scientific Python imports
 import matplotlib.pyplot as plt
 from skimage.transform import resize
-# Import datasets, classifiers and performance metrics
 from sklearn import datasets, svm, metrics
 from sklearn.model_selection import train_test_split
+from sklearn import tree
 import numpy as np
 from joblib import dump,load
+from statistics import mean,stdev
 
 test_to_train_ratio = [0.2]
 image_resolution = [8]
-gamma_array = [1,0.3,0.1,0.03,0.01,0.003,0.001,0.0003,0.0001]
+gamma_array =  [1,0.3,0.1,0.03,0.01,0.003,0.001,0.0003,0.0001]
+depth_array = [2,4,6,8,10,12,14,16,18,20,30,40,50,60,70,80]
 argmax_gamma_model = {}
 
 def create_split(data_x,data_y, train_part=70,test_part = 20 ,val_part=10):
     
-    X_train, X_test, y_train, y_test = train_test_split(data_x, data_y, test_size=((test_part+val_part)/ (train_part+test_part + val_part)), shuffle=False)
+    X_train, X_test, y_train, y_test = train_test_split(data_x, data_y, test_size=((test_part+val_part)/ (train_part+test_part + val_part)), shuffle=True)
     #print("before ",len(X_train),len(X_test))
-    X_test, X_val, y_test, y_val = train_test_split(X_test, y_test, test_size=((val_part)/(test_part+val_part)), shuffle=False)
+    X_test, X_val, y_test, y_val = train_test_split(X_test, y_test, test_size=((val_part)/(test_part+val_part)), shuffle=True)
     
     return X_train, X_test,  X_val, y_train, y_test,y_val 
     
@@ -69,23 +56,8 @@ def get_accuracy(imgs,expeted_model_file,train_part=70,test_part = 20 ,val_part=
     clf = load(argmax_gamma_model["model_name"])
     predicted = clf.predict(X_test)
 
-    ###############################################################################
-    # Below we visualize the first 4 test samples and show their predicted
-    # digit value in the title.
 
-    # _, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
-    # for ax, image, prediction in zip(axes, X_test, predicted):
-    #     ax.set_axis_off()
-    #     image = image.reshape(8, 8)
-    #     ax.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
-    #     ax.set_title(f'Prediction: {prediction}')
-
-    ###############################################################################
-    # :func:`~sklearn.metrics.classification_report` builds a text report showing
-    # the main classification metrics.
-
-    # print(f"Classification report for classifier {clf}:\n"
-    #       f"{metrics.classification_report(y_test, predicted)}\n")
+    
     # print(round(metrics.accuracy_score(y_test, predicted),4))
     train_metrics ={}
     train_metrics['acc'] = round(100*metrics.accuracy_score(y_test, predicted),2)
@@ -122,30 +94,88 @@ def run_classification_experiment(train,val,expeted_model_file):
     train_metrics['f1'] = round(metrics.f1_score(y_test, predicted, average='macro'),2) 
     print(train_metrics)
     return train_metrics
-###############################################################################
-# We can also plot a :ref:`confusion matrix <confusion_matrix>` of the
-# true digit values and the predicted digit values.
 
-# disp = metrics.plot_confusion_matrix(clf, X_test, y_test)
-# disp.figure_.suptitle("Confusion Matrix")
-# print(f"Confusion matrix:\n{disp.confusion_matrix}")
 
+def model_accuracy(model_name,X_train, X_test,  X_val, y_train, y_test,y_val,hyperparameter=1):
+    #X_train, X_test,  X_val, y_train, y_test,y_val  = create_split(data,digits.target,train_part,test_part ,val_part)
+    
+    # X_train, X_test,  X_val, y_train, y_test,y_val = create_split(data_x,data_y)# train.images,test.images,val.images,train.target,test.target,val.target
+    clf = 0
+    if(model_name=="SVM"):
+        clf = svm.SVC(gamma=hyperparameter)
+    if(model_name=="Dtree"):
+        clf =  tree.DecisionTreeClassifier(max_depth = hyperparameter)
+    clf.fit(X_train, y_train)
+    predicted = clf.predict(X_val)
+    accuracy_val = metrics.accuracy_score(y_val, predicted)
+    predicted = clf.predict(X_test)
+    accuracy_test = metrics.accuracy_score(y_test, predicted)
+    return accuracy_val,accuracy_test,hyperparameter
+
+def compare_svm_dtree(data_x,data_y):
+    X_train, X_test,  X_val, y_train, y_test,y_val = create_split(data_x,data_y)
+    X_train = X_train.reshape((len(X_train), -1))
+    X_test = X_test.reshape((len(X_test), -1))
+    X_val = X_val.reshape((len(X_val), -1))
+    maxi=0
+    SVM_accuracy=0
+    SVM_best_gamma = 0
+    Dtree_accuracy=0
+    Dtree_best_depth = 0
+    for g in gamma_array:
+        accuracy_val,accuracy_test,hyperparameter = model_accuracy("SVM",X_train, X_test,  X_val, y_train, y_test,y_val,hyperparameter=g)
+        if(accuracy_val>maxi):
+            maxi = accuracy_val
+            SVM_accuracy = accuracy_test
+            SVM_best_gamma = hyperparameter
+    maxi =0
+    for depth in depth_array:
+        accuracy_val,accuracy_test,hyperparameter = model_accuracy("Dtree",X_train, X_test,  X_val, y_train, y_test,y_val,hyperparameter=depth)
+        if(accuracy_val>maxi):
+            maxi = accuracy_val
+            Dtree_accuracy = accuracy_test
+            Dtree_best_depth = hyperparameter
+    return round(SVM_accuracy,2),SVM_best_gamma,round(Dtree_accuracy,2),Dtree_best_depth
+
+def print_table_comparision(freq = 5):
+    svm_array=[]
+    dtree_array=[]
+    digits = datasets.load_digits()
+    print("Sr,No.\t","SVM_acc","gamma\t","Dtree","depth",sep="\t")
+    print("------------------------------------------------------------------------------------")
+    for i in range(freq):
+        SVM_accuracy,SVM_best_gamma,Dtree_accuracy,Dtree_best_depth = compare_svm_dtree(digits.images,digits.target)
+        svm_array.append(SVM_accuracy)
+        dtree_array.append(Dtree_accuracy)
+        print(i,"",SVM_accuracy,SVM_best_gamma,"",Dtree_accuracy,Dtree_best_depth,sep='\t')
+    print("------------------------------------------------------------------------------------")
+    print("mean,std\t",mean(svm_array),"+-",round(stdev(svm_array),3),"\t",mean(dtree_array),"+-",round(stdev(dtree_array),3))
+
+print_table_comparision(5)
+    # global argmax_gamma_model
+    # for g in gamma_array:
+    #     clf = svm.SVC(gamma=g)
+    #     clf.fit(X_train, y_train)
+    #     predicted = clf.predict(X_val)
+    #     accuracy = metrics.accuracy_score(y_val, predicted)
+    #     if(maxi < accuracy):
+    #         maxi = accuracy
+    #         argmax_gamma_model["model_name"] = expeted_model_file#"models/best_accu_{}_gamma_{}_model.joblib".format(accuracy,g)
+    #         argmax_gamma_model["val_accu"] = accuracy
+    #         argmax_gamma_model["gamma"] = g
+    # dump(clf,argmax_gamma_model["model_name"])
+    # clf = load(argmax_gamma_model["model_name"])
+    # predicted = clf.predict(X_test)
+    # train_metrics ={}
+    # train_metrics['acc'] = round(100*metrics.accuracy_score(y_test, predicted),2)
+    # train_metrics['f1'] = round(metrics.f1_score(y_test, predicted, average='macro'),2) 
+    # print(train_metrics)
+    # return train_metrics
 #plt.show()
-###############################################################################
-# Digits dataset
-# --------------
-#
-# The digits dataset consists of 8x8
-# pixel images of digits. The ``images`` attribute of the dataset stores
-# 8x8 arrays of grayscale values for each image. We will use these arrays to
-# visualize the first 4 images. The ``target`` attribute of the dataset stores
-# the digit each image represents and this is included in the title of the 4
-# plots below.
-#
-# Note: if we were working from image files (e.g., 'png' files), we would load
+
 # them using :func:`matplotlib.pyplot.imread`.
 
-digits = datasets.load_digits()
+
 
 # _, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
 # for ax, image, label in zip(axes, digits.images, digits.target):
@@ -154,26 +184,12 @@ digits = datasets.load_digits()
 #     ax.set_title('Training: %i' % label)
 
 
-###############################################################################
-# Classification
-# --------------
-#
-# To apply a classifier on this data, we need to flatten the images, turning
-# each 2-D array of grayscale values from shape ``(8, 8)`` into shape
-# ``(64,)``. Subsequently, the entire dataset will be of shape
-# ``(n_samples, n_features)``, where ``n_samples`` is the number of images and
-# ``n_features`` is the total number of pixels in each image.
-#
-# We can then split the data into train and test subsets and fit a support
-# vector classifier on the train samples. The fitted classifier can
-# subsequently be used to predict the value of the digit for the samples
-# in the test subset.
 
 # flatten the images
 #test_to_train_ratio = [0.1,0.2,0.3]
 #image_resolution = [64,32,8]
 
-n_samples = len(digits.images)
+# n_samples = len(digits.images)
 
 # print(imgs.shape)
 # print(n_samples,digits.images.shape,get_accuracy(test_to_train_ratio,image_resolution))
