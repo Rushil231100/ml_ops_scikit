@@ -108,6 +108,7 @@ def model_accuracy(model_name,X_train, X_test,  X_val, y_train, y_test,y_val,hyp
     clf.fit(X_train, y_train)
     predicted = clf.predict(X_val)
     accuracy_val = metrics.accuracy_score(y_val, predicted)
+    #testing
     predicted = clf.predict(X_test)
     accuracy_test = metrics.accuracy_score(y_test, predicted)
     return accuracy_val,accuracy_test,hyperparameter
