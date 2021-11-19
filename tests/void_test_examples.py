@@ -8,9 +8,9 @@ def test_square():
     
 def test_model_writing():
 #    #creating data
-    expeted_model_file = "model_weights_testing_lambda_1.joblib"
+    expeted_model_file = "model_weights_testing_lambda_2.joblib"
     digits = datasets.load_digits()
-    plot_digits_classification.get_accuracy(digits.images, expeted_model_file)
+    plot_digits_classification.get_accuracy(digits, expeted_model_file)
     assert os.path.isfile(expeted_model_file)
 
 def void_test_small_data_overfit_checking():

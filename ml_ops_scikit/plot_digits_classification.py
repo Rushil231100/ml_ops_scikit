@@ -22,8 +22,9 @@ def create_split(data_x,data_y, train_part=70,test_part = 20 ,val_part=10):
     
     return X_train, X_test,  X_val, y_train, y_test,y_val 
     
-def get_accuracy(imgs,expeted_model_file,train_part=70,test_part = 20 ,val_part=10):
-    data = imgs.reshape((n_samples, -1))
+def get_accuracy(digits,expeted_model_file,train_part=70,test_part = 20 ,val_part=10):
+    n_samples = len(digits.images)
+    data = digits.images.reshape((n_samples, -1))
 
     # Create a classifier: a support vector classifier
     
@@ -111,6 +112,7 @@ def model_accuracy(model_name,X_train, X_test,  X_val, y_train, y_test,y_val,hyp
     #testing
     predicted = clf.predict(X_test)
     accuracy_test = metrics.accuracy_score(y_test, predicted)
+    dump(clf,model_name+str(hyperparameter)+".joblib")
     return accuracy_val,accuracy_test,hyperparameter
 
 def compare_svm_dtree(data_x,data_y):
