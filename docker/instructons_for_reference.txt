@@ -1,5 +1,5 @@
 sudo docker images
-suco docker container ls
+sudo docker container ls
 sudo docker build --rm -f docker/Dockerfile . -t mnist:latest
 sudo docker run -it mnist:latest
 
