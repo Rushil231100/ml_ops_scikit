@@ -12,4 +12,4 @@ ANALYSIS : After observing different behaviour with different hyperparameters,
 (c) MAX_DEPTH : For a DTree this is the most imtant parameter. If the depth is too low, it underfits, and if too large it overfits.
   
 
-![alt text](https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true)
+![alt text](https://github.com/Rushil231100/ml_ops_scikit/blob/features/final_exam/Screenshot%20from%202021-11-27%2019-19-00.png)
