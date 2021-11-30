@@ -1,47 +1,20 @@
-Quiz 3
-This is a readme file for feature/quiz3 branch
+ASSIGNMENT 10
+This is a readme file for feature/assignment_flask branch
 
-#RESULTS Obtained
+# RESULTS Obtained
 --Rushil Sanghavi (B18CSE066)
 
-This example shows how pytest helps in unit testing the svm and dtree models
+This assignment shows the use of flask inside the docker 
 
-1. Testing if for each digit 0-9 for SVM and DTREE best models (20 TESTS) 
-2. Testing if class wise accuracy is greater than a threshold min_accuracy in both SVM and DTREE (2 TESTS, each for one model)
+Insructon to RUN : 
+>>> 1. Clone repository
+>>> 2. sudo docker build -f docker/Dockerfile --tag flask-docker-demo-app .
+>>> 3. sudo docker run --name flask-docker-demo-app7 -p 5001:5001 flask-docker-demo-app
+
+>>> 4. On the other terminal , run
+>>> bash docker/docker_example.sh
 
 
-Details
-
-For second test I set threshold accuracy at 70% 
-
-
-result:
-
-All test passed successfully.
-
-tests/test_digits.py 
-[BONUS] 	SVM has passed minimum classwise accuracy assertion at 70% per class
-.[BONUS] 	 DTREE has passed minimum classwise accuracy assertion at 70% per class
-.SVM test for digit 0 passed
-.SVM test for digit 1 passed
-.SVM test for digit 2 passed
-.SVM test for digit 3 passed
-.SVM test for digit 4 passed
-.SVM test for digit 5 passed
-.SVM test for digit 6 passed
-.SVM test for digit 7 passed
-.SVM test for digit 8 passed
-.SVM test for digit 9 passed
-.Dtree test for digit 0 passed
-.Dtree test for digit 1 passed
-.Dtree test for digit 2 passed
-.Dtree test for digit 3 passed
-.Dtree test for digit 4 passed
-.Dtree test for digit 5 passed
-.Dtree test for digit 6 passed
-.Dtree test for digit 7 passed
-.Dtree test for digit 8 passed
-.Dtree test for digit 9 passed
-
+![alt text](https://github.com/Rushil231100/ml_ops_scikit/blob/features/final_exam/Screenshot%20from%202021-11-27%2019-19-00.png)
   
 
