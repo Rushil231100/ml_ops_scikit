@@ -3,8 +3,8 @@ from flask import request
 from joblib import dump,load
 import numpy as np
 app = Flask(__name__)
-model = load('/home/rushil/Desktop/ml_ops_scikit/ml_ops_scikit/models/best_accu_0.9559585492227979_gamme_0.001_model.joblib')
-model_dtree = load('/home/rushil/Desktop/ml_ops_scikit/ml_ops_scikit/models/Dtree12.joblib')
+model = load('best_accu_0.9559585492227979_gamme_0.001_model.joblib')
+model_dtree = load('Dtree12.joblib')
 class_name_index = {"0":0,"1":1,"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9}
 @app.route("/")
 def hello_world():
@@ -45,3 +45,6 @@ def predict_dree():
     # return None
     html_output = "<p>"+output_str+"<\p>"
     return output_str
+
+if __name__ == "__main__":
+    app.run(host ='0.0.0.0', port = 5001, debug = True)
